@@ -1,7 +1,4 @@
-import entity.Category;
-import entity.Currency;
 import entity.Response;
-import entity.Supplier;
 import lombok.SneakyThrows;
 import repository.*;
 import service.Services;
@@ -63,6 +60,11 @@ public class Main {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        try {
+            UsersRepository.refreshUsers();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("1.Category CRUD");
         System.out.println("2.Attachment CRUD");
@@ -98,15 +100,84 @@ public class Main {
             case 7 -> {
                 supplierMenu();
             }
-//            case 8 -> {
-////                usersMenu();
-//            }
+            case 8 -> {
+                usersMenu();
+            }
             case 9 -> {
                 warehouseMenu();
             }
             case 0 -> System.out.println("See you soon bro 😎 " +
                     "O`zizni ehtiyot qilishga majbursiz.");
 
+            default -> System.out.println("Bilib turib ko`zga cho`p tiqish yaxshimas aka🤨🤨🤨");
+        }
+    }
+
+    private static void usersMenu() {
+        System.out.println("1.Add user");
+        System.out.println("2.Show user");
+        System.out.println("3.Update user");
+        System.out.println("4.Delete user");
+        System.out.println("0.Back");
+        System.out.print("Select: ");
+        int n = SCANNER_NUM.nextInt();
+        switch (n) {
+            case 1 -> {
+                System.out.println("Enter user's email: ");
+                String email = SCANNER_STR.next();
+
+                System.out.println("Enter user's password: ");
+                String password = SCANNER_STR.next();
+
+                System.out.println("Enter user's phone number: ");
+                String phone = SCANNER_STR.next();
+
+                System.out.println("Enter user's fullName: ");
+                String fullName = SCANNER_STR.next();
+
+                try {
+                    Response response = UsersRepository.callFunctionAdd(email, password, fullName, phone);
+                    System.out.println(response);
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 2 -> {
+                UsersRepository.callFunctionSelect();
+                runn();
+            }
+            case 3 -> {
+                System.out.println("Enter user's fullname: ");
+                String fullname = new Scanner(System.in).nextLine();
+                System.out.println("Enter user's new  fullname: ");
+                String newFullname = SCANNER_STR.next();
+                System.out.println("Enter user's new email: ");
+                String email = SCANNER_STR.next();
+                System.out.println("Enter user's new  password: ");
+                String password = SCANNER_STR.next();
+
+                try {
+                    Response response = UsersRepository.callFunctionUpdate(fullname, newFullname, email, password);
+                    System.out.println(response);
+                    runn();
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 4 -> {
+                System.out.println("Enter user's fullname: ");
+                String fullName = new Scanner(System.in).nextLine();
+                try {
+                    System.out.println(UsersRepository.callFunctionDelete(fullName));
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 0 -> runn();
             default -> System.out.println("Bilib turib ko`zga cho`p tiqish yaxshimas aka🤨🤨🤨");
         }
     }
@@ -134,7 +205,7 @@ public class Main {
                 Integer attachmentId = SCANNER_STR.nextInt();
 
                 try {
-                    Response response = ProductRepository.callFunctionAdd(name,categoryId,measurementId,attachmentId);
+                    Response response = ProductRepository.callFunctionAdd(name, categoryId, measurementId, attachmentId);
                     System.out.println(response);
                     runn();
                 } catch (SQLException e) {
@@ -161,7 +232,7 @@ public class Main {
                 int attachmentId = SCANNER_STR.nextInt();
 
                 try {
-                    Response response = ProductRepository.callFunctionUpdate(name, newName,categoryId,measurementId,attachmentId);
+                    Response response = ProductRepository.callFunctionUpdate(name, newName, categoryId, measurementId, attachmentId);
                     System.out.println(response);
                     runn();
 
