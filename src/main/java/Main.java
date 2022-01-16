@@ -1,11 +1,10 @@
 import entity.Category;
 import entity.Currency;
 import entity.Response;
+import entity.Supplier;
 import lombok.SneakyThrows;
-import repository.AttachmentRepository;
-import repository.CategoryRepository;
-import repository.ClientRepository;
-import repository.CurrencyRepository;
+import repository.*;
+import service.Services;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -20,7 +19,7 @@ public class Main {
 
     @SneakyThrows
     public static void main(String[] args) {
-    runn();
+        runn();
     }
 
     public static void runn() {
@@ -44,6 +43,27 @@ public class Main {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        try {
+            MeasurementRepository.refreshMeasurements();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            SupplierRepository.refreshSuppliers();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            WarehouseRepository.refreshWarehouses();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            ProductRepository.refreshProducts();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         System.out.println("1.Category CRUD");
         System.out.println("2.Attachment CRUD");
         System.out.println("3.Client CRUD");
@@ -69,25 +89,263 @@ public class Main {
             case 4 -> {
                 currencyMenu();
             }
-//            case 5 -> {
-////                measurementMenu();
-//            }
-//            case 6 -> {
-////                productMenu();
-//            }
-//            case 7 -> {
-////                supplierMenu();
-//            }
+            case 5 -> {
+                measurementMenu();
+            }
+            case 6 -> {
+                productMenu();
+            }
+            case 7 -> {
+                supplierMenu();
+            }
 //            case 8 -> {
 ////                usersMenu();
 //            }
-//            case 9 -> {
-////                warehouseMenu();
-//            }
-            case 0 ->
-                System.out.println("See you soon bro 😎 " +
-                        "O`zizni ehtiyot qilishga majbursiz.");
+            case 9 -> {
+                warehouseMenu();
+            }
+            case 0 -> System.out.println("See you soon bro 😎 " +
+                    "O`zizni ehtiyot qilishga majbursiz.");
 
+            default -> System.out.println("Bilib turib ko`zga cho`p tiqish yaxshimas aka🤨🤨🤨");
+        }
+    }
+
+    private static void productMenu() {
+        System.out.println("1.Add product");
+        System.out.println("2.Show product");
+        System.out.println("3.Update product");
+        System.out.println("4.Delete product");
+        System.out.println("0.Back");
+        System.out.print("Select: ");
+        int n = SCANNER_NUM.nextInt();
+        switch (n) {
+            case 1 -> {
+                System.out.println("Enter product name: ");
+                String name = SCANNER_STR.next();
+                Services.showAnyList(Database.categories);
+                System.out.println("Enter category id: ");
+                Integer categoryId = SCANNER_STR.nextInt();
+                Services.showAnyList(Database.measurements);
+                System.out.println("Enter measurement id: ");
+                Integer measurementId = SCANNER_STR.nextInt();
+                Services.showAnyList(Database.attachments);
+                System.out.println("Enter attachment id: ");
+                Integer attachmentId = SCANNER_STR.nextInt();
+
+                try {
+                    Response response = ProductRepository.callFunctionAdd(name,categoryId,measurementId,attachmentId);
+                    System.out.println(response);
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 2 -> {
+                ProductRepository.callFunctionSelect();
+                runn();
+            }
+            case 3 -> {
+                System.out.println("Enter product name: ");
+                String name = SCANNER_STR.next();
+                System.out.println("Enter new product name: ");
+                String newName = SCANNER_STR.next();
+                Services.showAnyList(Database.categories);
+                System.out.println("Enter category id: ");
+                int categoryId = SCANNER_STR.nextInt();
+                Services.showAnyList(Database.measurements);
+                System.out.println("Enter measurement id: ");
+                int measurementId = SCANNER_STR.nextInt();
+                Services.showAnyList(Database.attachments);
+                System.out.println("Enter attachment id: ");
+                int attachmentId = SCANNER_STR.nextInt();
+
+                try {
+                    Response response = ProductRepository.callFunctionUpdate(name, newName,categoryId,measurementId,attachmentId);
+                    System.out.println(response);
+                    runn();
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 4 -> {
+                System.out.println("Enter product name: ");
+                String name = SCANNER_STR.next();
+                try {
+                    System.out.println(ProductRepository.callFunctionDelete(name));
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 0 -> runn();
+            default -> System.out.println("Bilib turib ko`zga cho`p tiqish yaxshimas aka🤨🤨🤨");
+        }
+    }
+
+    private static void warehouseMenu() {
+        System.out.println("1.Add warehouse");
+        System.out.println("2.Show warehouse");
+        System.out.println("3.Update warehouse");
+        System.out.println("4.Delete warehouse");
+        System.out.println("0.Back");
+        System.out.print("Select: ");
+        int n = SCANNER_NUM.nextInt();
+        switch (n) {
+            case 1 -> {
+                System.out.println("Enter warehouse name: ");
+                String name = SCANNER_STR.next();
+                try {
+                    Response response = WarehouseRepository.callFunctionAdd(name);
+                    System.out.println(response);
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 2 -> {
+                WarehouseRepository.callFunctionSelect();
+                runn();
+            }
+            case 3 -> {
+                System.out.println("Enter warehouse name: ");
+                String name = SCANNER_STR.next();
+                System.out.println("Enter new warehouse name: ");
+                String newName = SCANNER_STR.next();
+
+                try {
+                    Response response = WarehouseRepository.callFunctionUpdate(name, newName);
+                    System.out.println(response);
+                    runn();
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 4 -> {
+                System.out.println("Enter warehouse name: ");
+                String name = SCANNER_STR.next();
+                try {
+                    System.out.println(WarehouseRepository.callFunctionDelete(name));
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 0 -> runn();
+            default -> System.out.println("Bilib turib ko`zga cho`p tiqish yaxshimas aka🤨🤨🤨");
+        }
+    }
+
+    private static void supplierMenu() {
+        System.out.println("1.Add supplier");
+        System.out.println("2.Show supplier");
+        System.out.println("3.Update supplier");
+        System.out.println("4.Delete supplier");
+        System.out.println("0.Back");
+        System.out.print("Select: ");
+        int n = SCANNER_NUM.nextInt();
+        switch (n) {
+            case 1 -> {
+                System.out.println("Enter supplier name: ");
+                String name = SCANNER_STR.next();
+                try {
+                    Response response = SupplierRepository.callFunctionAdd(name);
+                    System.out.println(response);
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 2 -> {
+                SupplierRepository.callFunctionSelect();
+                runn();
+            }
+            case 3 -> {
+                System.out.println("Enter supplier name: ");
+                String name = SCANNER_STR.next();
+                System.out.println("Enter new supplier name: ");
+                String newName = SCANNER_STR.next();
+
+                try {
+                    Response response = SupplierRepository.callFunctionUpdate(name, newName);
+                    System.out.println(response);
+                    runn();
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 4 -> {
+                System.out.println("Enter supplier name: ");
+                String name = SCANNER_STR.next();
+                try {
+                    System.out.println(SupplierRepository.callFunctionDelete(name));
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 0 -> runn();
+            default -> System.out.println("Bilib turib ko`zga cho`p tiqish yaxshimas aka🤨🤨🤨");
+        }
+    }
+
+    private static void measurementMenu() {
+        System.out.println("1.Add measurement");
+        System.out.println("2.Show measurement");
+        System.out.println("3.Update measurement");
+        System.out.println("4.Delete measurement");
+        System.out.println("0.Back");
+        System.out.print("Select: ");
+        int n = SCANNER_NUM.nextInt();
+        switch (n) {
+            case 1 -> {
+                System.out.println("Enter measurement name: ");
+                String name = SCANNER_STR.next();
+                try {
+                    Response response = MeasurementRepository.callFunctionAdd(name);
+                    System.out.println(response);
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 2 -> {
+                MeasurementRepository.callFunctionSelect();
+                runn();
+            }
+            case 3 -> {
+                System.out.println("Enter measurement name: ");
+                String name = SCANNER_STR.next();
+                System.out.println("Enter new measurement name: ");
+                String newName = SCANNER_STR.next();
+
+                try {
+                    Response response = MeasurementRepository.callFunctionUpdate(name, newName);
+                    System.out.println(response);
+                    runn();
+
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 4 -> {
+                System.out.println("Enter measurement name: ");
+                String name = SCANNER_STR.next();
+                try {
+                    System.out.println(MeasurementRepository.callFunctionDelete(name));
+                    runn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            case 0 -> runn();
             default -> System.out.println("Bilib turib ko`zga cho`p tiqish yaxshimas aka🤨🤨🤨");
         }
     }
@@ -162,7 +420,7 @@ public class Main {
                 System.out.println("Enter phone number: ");
                 String phone = SCANNER_STR.next();
                 try {
-                    Response response = ClientRepository.callFunctionAdd(name,phone);
+                    Response response = ClientRepository.callFunctionAdd(name, phone);
                     System.out.println(response);
                     runn();
                 } catch (SQLException e) {
@@ -182,7 +440,7 @@ public class Main {
                 String phone = SCANNER_STR.next();
 
                 try {
-                    Response response = ClientRepository.callFunctionUpdate(name,newName,phone);
+                    Response response = ClientRepository.callFunctionUpdate(name, newName, phone);
                     System.out.println(response);
                     runn();
 
@@ -223,7 +481,7 @@ public class Main {
                 System.out.println("Enter attachment content type(For example: .jpg or .png): ");
                 String contentType = SCANNER_STR.next();
                 try {
-                    Response response = AttachmentRepository.callFunctionAdd(name,size,contentType);
+                    Response response = AttachmentRepository.callFunctionAdd(name, size, contentType);
                     System.out.println(response);
                     runn();
                 } catch (SQLException e) {
@@ -245,7 +503,7 @@ public class Main {
                 String contentType = SCANNER_STR.next();
 
                 try {
-                    Response response = AttachmentRepository.callFunctionUpdate(name, newName,size,contentType);
+                    Response response = AttachmentRepository.callFunctionUpdate(name, newName, size, contentType);
                     System.out.println(response);
                     runn();
 
@@ -316,7 +574,7 @@ public class Main {
                 String name = SCANNER_STR.next();
                 try {
                     System.out.println(CategoryRepository.callFunctionDelete(name));
-runn();
+                    runn();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
